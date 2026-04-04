@@ -5,13 +5,31 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 def bosh_sahifa(request):
-    return HttpResponse("<h1>Salom, bu mening birinchi blog sahifam!</h1> <p>Bu yerda men blog postlarini joylashtiraman.</p>")
+    context = {
+        'sarlavha': 'Xush kelibsiz, bu mening blogim!',
+        'postlar': [
+            {'id': 1, 'title': 'Birinchi post', 'muallif': 'Ali'},
+            {'id': 2, 'title': 'Ikkinchi post', 'muallif': 'Vali'},
+            {'id': 3, 'title': 'Uchinchi post', 'muallif': 'Hasan'},
+        ]
+    }
+
+    return render(request, 'posts/bosh.html', context)
 
 def haqida(request):
-    return HttpResponse("<h1>Bu mening blogim haqida sahifa!</h1> <p>Bu yerda men o'zim va blogim haqida ma'lumot beraman.</p>")
+    return render(request, 'posts/haqida.html')
 
 def post_detail(request, post_id):
-    return HttpResponse(f"<h1>Post {post_id} tafsilotlari</h1> <p>Bu yerda postning tafsilotlari ko'rsatiladi.</p>")
+    context = {
+        'sarlavha': f'Post {post_id} tafsilotlari',
+        'post': {
+            'id': post_id,
+            'title': f'Post {post_id} sarlavhasi',
+            'content': f'Bu yerda Post {post_id} ning tafsilotlari ko\'rsatiladi.',
+            'muallif': 'Ali',
+        }
+    }
+    return render(request, 'posts/detail.html', context)
 
 def foydalanuvchi(request, username):
     return HttpResponse(f"<h1>Foydalanuvchi: {username}</h1> <p>Bu yerda foydalanuvchining profili ko'rsatiladi.</p>")

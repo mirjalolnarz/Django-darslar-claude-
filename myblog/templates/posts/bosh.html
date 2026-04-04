@@ -1,9 +1,19 @@
 <!-- templates/posts/bosh.html -->
 {% extends 'base.html' %}
 
-{% block title %}Bosh sahifa{% endblock %}
+{% block title %}{{ sarlavha }}{% endblock %}
 
 {% block content %}
-    <h1>Salom, Django! 👋</h1>
-    <p>Bu mening birinchi blog saytim.</p>
+    <h1>{{ sarlavha }}</h1>
+    <h2> So'nggi postlar</h2>
+    <ul>
+        {% for post in postlar %}
+            <li>
+                <a href="/posts/{{ post.id }}/">{{ post.title }}</a> - Muallif: {{ post.muallif }}
+            </li>
+        {% empty %}
+            <li>Hozircha postlar mavjud emas.</li>
+        {% endfor %}
+    </ul>
+
 {% endblock %}
