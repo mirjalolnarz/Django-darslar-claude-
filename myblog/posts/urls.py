@@ -15,5 +15,4 @@ urlpatterns = [
     # slug - harflar, raqamlar, tire va pastki chiziqlarni o'z ichiga olishi mumkin
     path('maqola/<slug:slug>/', views.maqola, name='maqola'),
 
-
 ]

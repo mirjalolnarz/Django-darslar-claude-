@@ -1,19 +1,14 @@
 <!-- templates/posts/bosh.html -->
 {% extends 'base.html' %}
-
-{% block title %}{{ sarlavha }}{% endblock %}
-
 {% block content %}
-    <h1>{{ sarlavha }}</h1>
-    <h2> So'nggi postlar</h2>
-    <ul>
-        {% for post in postlar %}
-            <li>
-                <a href="/posts/{{ post.id }}/">{{ post.title }}</a> - Muallif: {{ post.muallif }}
-            </li>
-        {% empty %}
-            <li>Hozircha postlar mavjud emas.</li>
-        {% endfor %}
-    </ul>
-
+    <h1>Blog postlar</h1>
+    {% for post in postlar %}
+        <div>
+            <h2><a href="/posts/{{ post.id }}/">{{ post.title }}</a></h2>
+            <p>{{ post.content|truncatechars:100 }}</p>
+            <small>{{ post.created_at|date:"d.m.Y" }}</small>
+        </div>
+    {% empty %}
+        <p>Hozircha postlar yo'q.</p>
+    {% endfor %}
 {% endblock %}
