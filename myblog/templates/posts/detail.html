@@ -1,12 +1,11 @@
 <!-- templates/posts/detail.html -->
 {% extends 'base.html' %}
-
 {% block title %}{{ post.title }}{% endblock %}
-
 {% block content %}
     <h1>{{ post.title }}</h1>
     <small>{{ post.created_at|date:"d.m.Y H:i" }}</small>
     <p>{{ post.content }}</p>
+    <a href="/posts/{{ post.id }}/tahrir/">✏ Tahrirlash</a> |
+    <a href="/posts/{{ post.id }}/ochir/" style="color:red;">🗑 O'chirish</a> |
     <a href="/">← Orqaga</a>
-
 {% endblock %}

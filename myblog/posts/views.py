@@ -1,9 +1,10 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404
 from .models import Post
 
 # Create your views here.
 
 from django.http import HttpResponse
+from .forms import PostForm
 
 def bosh_sahifa(request):
     postlar = Post.objects.filter(published=True)[:5]  # So'nggi 5 ta nashr qilingan postlarni olish
@@ -22,3 +23,34 @@ def foydalanuvchi(request, username):
 
 def maqola(request, slug):
     return HttpResponse(f"<h1>Maqola: {slug}</h1> <p>Bu yerda maqolaning tafsilotlari ko'rsatiladi.</p>")
+
+def post_create(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save()
+            return redirect('post_detail', post_id=post.id)  # Yaratilgan postning tafsilot sahifasiga yo'naltirish
+    else:
+        form = PostForm() # Bo'sh form yaratish
+
+    return render(request, 'posts/post_form.html', {'form': form})
+
+def post_update(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if request.method == 'POST':
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            return HttpResponse("Post muvaffaqiyatli yangilandi!")
+    else:
+        form = PostForm(instance=post) # Mavjud post ma'lumotlari bilan form yaratish
+    
+    return render(request, 'posts/post_form.html', {'form': form})
+
+def post_delete(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if request.method == 'POST':
+        post.delete()
+        return HttpResponse("Post muvaffaqiyatli o'chirildi!")
+    
+    return render(request, 'posts/post_confirm_delete.html', {'post': post})

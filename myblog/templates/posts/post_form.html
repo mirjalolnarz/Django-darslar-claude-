@@ -1,0 +1,31 @@
+<!-- templates/posts/post_form.html -->
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if post %}Postni tahrirlash{% else %}Yangi post{% endif %}
+{% endblock %}
+
+{% block content %}
+<h1>{% if post %}Postni tahrirlash{% else %}Yangi post yaratish{% endif %}</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+    {% for field in form %}
+        <div style="margin-bottom: 16px;">
+            <label><strong>{{ field.label }}</strong></label><br>
+            {{ field }}
+            {% if field.errors %}
+                {% for error in field.errors %}
+                    <p style="color: red; font-size: 13px;">⚠ {{ error }}</p>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    <button type="submit">
+        {% if post %}Saqlash{% else %}Yaratish{% endif %}
+    </button>
+    <a href="/">Bekor qilish</a>
+</form>
+{% endblock %}
