@@ -15,7 +15,7 @@ def haqida(request):
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id, published=True)  # Postni olish yoki 404 xatolikni ko'rsatish
-    return render(request, 'posts/detail.html', {'post': post, 'sarlavha': post.title})
+    return render(request, 'posts/detail.html', {'post': post})
 
 def foydalanuvchi(request, username):
     return HttpResponse(f"<h1>Foydalanuvchi: {username}</h1> <p>Bu yerda foydalanuvchining profili ko'rsatiladi.</p>")
