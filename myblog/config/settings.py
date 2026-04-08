@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'posts',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -119,3 +120,8 @@ STATIC_URL = 'static/'
 
 # config/settings.py — faylning istalgan joyiga qo'shing
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# config/settings.py
+LOGIN_URL = '/login/'             # kirish sahifasi
+LOGIN_REDIRECT_URL = '/'          # kirganidan keyin
+LOGOUT_REDIRECT_URL = '/login/'   # chiqqandan keyin

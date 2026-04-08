@@ -1,3 +1,5 @@
+# posts/views.py
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render, get_object_or_404
 from .models import Post
 
@@ -24,6 +26,7 @@ def foydalanuvchi(request, username):
 def maqola(request, slug):
     return HttpResponse(f"<h1>Maqola: {slug}</h1> <p>Bu yerda maqolaning tafsilotlari ko'rsatiladi.</p>")
 
+@login_required(login_url='/login/')
 def post_create(request):
     if request.method == 'POST':
         form = PostForm(request.POST)
@@ -35,6 +38,7 @@ def post_create(request):
 
     return render(request, 'posts/post_form.html', {'form': form})
 
+@login_required(login_url='/login/')
 def post_update(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.method == 'POST':
@@ -47,6 +51,7 @@ def post_update(request, post_id):
     
     return render(request, 'posts/post_form.html', {'form': form})
 
+@login_required(login_url='/login/')
 def post_delete(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.method == 'POST':

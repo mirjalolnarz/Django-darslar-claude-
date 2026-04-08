@@ -11,10 +11,23 @@
     </style>
 </head>
 <body>
+    <!-- templates/base.html -->
     <nav>
         <a href="/">🏠 Bosh sahifa</a>
         <a href="/haqida/">Haqimizda</a>
-        <a href="/posts/yangi/">Yangi post</a>
+
+        {% if request.user.is_authenticated %}
+            <span>👤 {{ request.user.username }}</span>
+            <form method="post" action="/logout/" style="display:inline">
+                {% csrf_token %}
+                <button type="submit" style="background:none;border:none;cursor:pointer;color:#333">
+                    Chiqish
+                </button>
+            </form>
+        {% else %}
+            <a href="/login/">Kirish</a>
+            <a href="/register/">Ro'yxatdan o'tish</a>
+        {% endif %}
     </nav>
     <hr>
 

@@ -24,4 +24,5 @@ admin.site.index_title = "Boshqaruv Paneli"
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('posts.urls')),
+    path('', include('accounts.urls')),  # accounts ilovasining URL'larini qo'shish
 ]
