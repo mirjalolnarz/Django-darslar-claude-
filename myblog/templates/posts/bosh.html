@@ -1,14 +1,43 @@
 <!-- templates/posts/bosh.html -->
 {% extends 'base.html' %}
 {% block content %}
-    <h1>Blog postlar</h1>
-    {% for post in postlar %}
-        <div>
-            <h2><a href="/posts/{{ post.id }}/">{{ post.title }}</a></h2>
-            <p>{{ post.content|truncatechars:100 }}</p>
-            <small>{{ post.created_at|date:"d.m.Y" }}</small>
-        </div>
-    {% empty %}
-        <p>Hozircha postlar yo'q.</p>
-    {% endfor %}
+
+<h1>Blog postlar</h1>
+<a href="{% url 'post_create' %}">+ Yangi post</a>
+<hr>
+
+{% for post in postlar %}
+    <div style="margin-bottom: 20px;">
+        {% if post.image %}
+            <img src="{{ post.image.url }}"
+                alt="{{ post.title }}"
+                style="width:30%; border-radius:8px; margin:16px 0">
+        {% endif %}
+        <h2>
+            <a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a>
+        </h2>
+        <p>{{ post.content|truncatechars:120 }}</p>
+        <small>{{ post.created_at|date:"d.m.Y" }}</small>
+    </div>
+{% empty %}
+    <p>Hozircha postlar yo'q.</p>
+{% endfor %}
+
+<!-- Sahifalash tugmalari -->
+{% if is_paginated %}
+    <div style="margin-top: 20px;">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}">← Oldingi</a>
+        {% endif %}
+
+        <span>
+            {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">Keyingi →</a>
+        {% endif %}
+    </div>
+{% endif %}
+
 {% endblock %}

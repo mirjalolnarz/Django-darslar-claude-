@@ -1,31 +1,25 @@
 <!-- templates/posts/post_form.html -->
 {% extends 'base.html' %}
-
-{% block title %}
-    {% if post %}Postni tahrirlash{% else %}Yangi post{% endif %}
-{% endblock %}
-
 {% block content %}
-<h1>{% if post %}Postni tahrirlash{% else %}Yangi post yaratish{% endif %}</h1>
+<div class="form-wrap">
+    <h1>{% if post %}Tahrirlash{% else %}Yangi post{% endif %}</h1>
 
-<form method="post">
-    {% csrf_token %}
-
-    {% for field in form %}
-        <div style="margin-bottom: 16px;">
-            <label><strong>{{ field.label }}</strong></label><br>
+    <!-- enctype="multipart/form-data" — fayl yuklash uchun MAJBURIY -->
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+            <label>{{ field.label }}</label>
             {{ field }}
-            {% if field.errors %}
-                {% for error in field.errors %}
-                    <p style="color: red; font-size: 13px;">⚠ {{ error }}</p>
-                {% endfor %}
-            {% endif %}
+            {% for error in field.errors %}
+                <p class="error">⚠ {{ error }}</p>
+            {% endfor %}
         </div>
-    {% endfor %}
-
-    <button type="submit">
-        {% if post %}Saqlash{% else %}Yaratish{% endif %}
-    </button>
-    <a href="/">Bekor qilish</a>
-</form>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">
+            {% if post %}Saqlash{% else %}Yaratish{% endif %}
+        </button>
+        <a href="{% url 'bosh' %}" class="btn btn-secondary">Bekor qilish</a>
+    </form>
+</div>
 {% endblock %}

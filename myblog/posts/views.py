@@ -1,61 +1,95 @@
 # posts/views.py
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render, get_object_or_404
+from django.views.generic import (
+    ListView, DetailView,
+    CreateView, UpdateView, DeleteView,
+    TemplateView
+)
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
+from django.db.models import Q, Count
 from .models import Post
-
-# Create your views here.
-
-from django.http import HttpResponse
 from .forms import PostForm
 
-def bosh_sahifa(request):
-    postlar = Post.objects.filter(published=True)[:5]  # So'nggi 5 ta nashr qilingan postlarni olish
-    context = {'postlar': postlar}
-    return render(request, 'posts/bosh.html', context)
 
-def haqida(request):
-    return render(request, 'posts/haqida.html')
+# --- Ro'yxat ---
+class PostListView(ListView):
+    model               = Post
+    template_name       = 'posts/bosh.html'
+    context_object_name = 'postlar'
+    paginate_by         = 5
 
-def post_detail(request, post_id):
-    post = get_object_or_404(Post, id=post_id, published=True)  # Postni olish yoki 404 xatolikni ko'rsatish
-    return render(request, 'posts/detail.html', {'post': post})
+    def get_queryset(self):
+        queryset = Post.objects.filter(published=True)
 
-def foydalanuvchi(request, username):
-    return HttpResponse(f"<h1>Foydalanuvchi: {username}</h1> <p>Bu yerda foydalanuvchining profili ko'rsatiladi.</p>")
+        # URL da ?q=django bo'lsa qidiruv
+        q = self.request.GET.get('q')
+        if q:
+            queryset = queryset.filter(
+                Q(title__icontains=q) |
+                Q(content__icontains=q)
+            )
 
-def maqola(request, slug):
-    return HttpResponse(f"<h1>Maqola: {slug}</h1> <p>Bu yerda maqolaning tafsilotlari ko'rsatiladi.</p>")
+        return queryset
 
-@login_required(login_url='/login/')
-def post_create(request):
-    if request.method == 'POST':
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save()
-            return redirect('post_detail', post_id=post.id)  # Yaratilgan postning tafsilot sahifasiga yo'naltirish
-    else:
-        form = PostForm() # Bo'sh form yaratish
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Statistika qo'shamiz
+        context['jami_postlar'] = Post.objects.filter(published=True).count()
+        context['qidiruv'] = self.request.GET.get('q', '')
+        return context
 
-    return render(request, 'posts/post_form.html', {'form': form})
 
-@login_required(login_url='/login/')
-def post_update(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    if request.method == 'POST':
-        form = PostForm(request.POST, instance=post)
-        if form.is_valid():
-            form.save()
-            return HttpResponse("Post muvaffaqiyatli yangilandi!")
-    else:
-        form = PostForm(instance=post) # Mavjud post ma'lumotlari bilan form yaratish
-    
-    return render(request, 'posts/post_form.html', {'form': form})
+# --- Bitta post ---
+class PostDetailView(DetailView):
+    model         = Post
+    template_name = 'posts/detail.html'
+    # Avtomatik: {{ object }} yoki {{ post }} — context_object_name bilan
+    context_object_name = 'post'
 
-@login_required(login_url='/login/')
-def post_delete(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    if request.method == 'POST':
-        post.delete()
-        return HttpResponse("Post muvaffaqiyatli o'chirildi!")
-    
-    return render(request, 'posts/post_confirm_delete.html', {'post': post})
+
+# --- Yaratish ---
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model         = Post
+    form_class    = PostForm
+    template_name = 'posts/post_form.html'
+    login_url     = '/login/'
+
+    # def post(self, request, *args, **kwargs):
+    #     form = PostForm(request.POST, request.FILES)
+    #     if form.is_valid():
+    #         post = form.save(commit=False)
+    #         return redirect('post_detail', pk=post.pk)
+    #     return render(request, self.template_name, {'form': form})
+
+    def form_valid(self, form):
+        # Saqlashdan oldin muallif qo'shamiz
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return f'/posts/{self.object.id}/'
+
+
+# --- Tahrirlash ---
+class PostUpdateView(LoginRequiredMixin, UpdateView):
+    model         = Post
+    form_class    = PostForm
+    template_name = 'posts/post_form.html'
+    login_url     = '/login/'
+
+    def get_success_url(self):
+        return f'/posts/{self.object.id}/'
+
+
+# --- O'chirish ---
+class PostDeleteView(LoginRequiredMixin, DeleteView):
+    model         = Post
+    template_name = 'posts/post_confirm_delete.html'
+    success_url   = reverse_lazy('bosh')   # o'chirilgandan keyin bosh sahifa
+    login_url     = '/login/'
+
+
+# --- Haqida ---
+class HaqidaView(TemplateView):
+    template_name = 'posts/haqida.html'
